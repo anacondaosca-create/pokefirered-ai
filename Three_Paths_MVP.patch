@@ -1,0 +1,464 @@
+diff --git a/data/maps/PalletTown_ProfessorOaksLab/map.json b/data/maps/PalletTown_ProfessorOaksLab/map.json
+index be72653..9e8d7df 100644
+--- a/data/maps/PalletTown_ProfessorOaksLab/map.json
++++ b/data/maps/PalletTown_ProfessorOaksLab/map.json
+@@ -132,6 +132,21 @@
+       "script": "PalletTown_ProfessorOaksLab_EventScript_Rival",
+       "flag": "FLAG_HIDE_RIVAL_IN_LAB"
+     },
++    {
++      "local_id": "LOCALID_OAKS_LAB_GREEN",
++      "type": "object",
++      "graphics_id": "OBJ_EVENT_GFX_GREEN_RIVAL",
++      "x": 7,
++      "y": 4,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
++      "movement_range_x": 0,
++      "movement_range_y": 0,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "PalletTown_ProfessorOaksLab_EventScript_Green",
++      "flag": "0"
++    },
+     {
+       "local_id": "LOCALID_POKEDEX_1",
+       "type": "object",
+diff --git a/data/maps/PalletTown_ProfessorOaksLab/scripts.inc b/data/maps/PalletTown_ProfessorOaksLab/scripts.inc
+index 90adf86..6e29efc 100644
+--- a/data/maps/PalletTown_ProfessorOaksLab/scripts.inc
++++ b/data/maps/PalletTown_ProfessorOaksLab/scripts.inc
+@@ -2,6 +2,8 @@
+ .equ PLAYER_STARTER_SPECIES,  VAR_TEMP_2
+ .equ RIVAL_STARTER_SPECIES,   VAR_TEMP_3
+ .equ RIVAL_STARTER_ID,        VAR_TEMP_4
++.equ GREEN_STARTER_SPECIES,    VAR_TEMP_5
++.equ GREEN_STARTER_ID,         VAR_TEMP_6
+ 
+ .equ SHOWED_OAK_COMPLETE_DEX, FLAG_TEMP_2
+ 
+@@ -564,6 +566,61 @@ PalletTown_ProfessorOaksLab_EventScript_RivalChoseStarter::
+ 	release
+ 	end
+ 
++PalletTown_ProfessorOaksLab_EventScript_Green::
++    lock
++    faceplayer
++    goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 4, PalletTown_ProfessorOaksLab_EventScript_GreenChallenge
++    goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3, PalletTown_ProfessorOaksLab_EventScript_GreenHasStarter
++    msgbox PalletTown_ProfessorOaksLab_Text_GreenIntro
++    release
++    end
++
++PalletTown_ProfessorOaksLab_EventScript_GreenHasStarter::
++    goto_if_eq VAR_STARTER_MON, 0, PalletTown_ProfessorOaksLab_EventScript_GreenHasSquirtle
++    goto_if_eq VAR_STARTER_MON, 1, PalletTown_ProfessorOaksLab_EventScript_GreenHasCharmander
++    goto PalletTown_ProfessorOaksLab_EventScript_GreenHasBulbasaur
++
++PalletTown_ProfessorOaksLab_EventScript_GreenHasSquirtle::
++    bufferspeciesname STR_VAR_1, SPECIES_SQUIRTLE
++    msgbox PalletTown_ProfessorOaksLab_Text_GreenHasStarter
++    release
++    end
++
++PalletTown_ProfessorOaksLab_EventScript_GreenHasCharmander::
++    bufferspeciesname STR_VAR_1, SPECIES_CHARMANDER
++    msgbox PalletTown_ProfessorOaksLab_Text_GreenHasStarter
++    release
++    end
++
++PalletTown_ProfessorOaksLab_EventScript_GreenHasBulbasaur::
++    bufferspeciesname STR_VAR_1, SPECIES_BULBASAUR
++    msgbox PalletTown_ProfessorOaksLab_Text_GreenHasStarter
++    release
++    end
++
++PalletTown_ProfessorOaksLab_EventScript_GreenChallenge::
++    goto_if_eq VAR_STARTER_MON, 0, PalletTown_ProfessorOaksLab_EventScript_GreenBattleSquirtle
++    goto_if_eq VAR_STARTER_MON, 1, PalletTown_ProfessorOaksLab_EventScript_GreenBattleCharmander
++    goto PalletTown_ProfessorOaksLab_EventScript_GreenBattleBulbasaur
++
++PalletTown_ProfessorOaksLab_EventScript_GreenBattleSquirtle::
++    trainerbattle_single TRAINER_THREE_PATHS_GREEN_SQUIRTLE, PalletTown_ProfessorOaksLab_Text_GreenBattleIntro, PalletTown_ProfessorOaksLab_Text_GreenBattleDefeat
++    msgbox PalletTown_ProfessorOaksLab_Text_GreenAfterBattle
++    release
++    end
++
++PalletTown_ProfessorOaksLab_EventScript_GreenBattleCharmander::
++    trainerbattle_single TRAINER_THREE_PATHS_GREEN_CHARMANDER, PalletTown_ProfessorOaksLab_Text_GreenBattleIntro, PalletTown_ProfessorOaksLab_Text_GreenBattleDefeat
++    msgbox PalletTown_ProfessorOaksLab_Text_GreenAfterBattle
++    release
++    end
++
++PalletTown_ProfessorOaksLab_EventScript_GreenBattleBulbasaur::
++    trainerbattle_single TRAINER_THREE_PATHS_GREEN_BULBASAUR, PalletTown_ProfessorOaksLab_Text_GreenBattleIntro, PalletTown_ProfessorOaksLab_Text_GreenBattleDefeat
++    msgbox PalletTown_ProfessorOaksLab_Text_GreenAfterBattle
++    release
++    end
++
+ PalletTown_ProfessorOaksLab_EventScript_ProfOak::
+ 	lock
+ 	faceplayer
+@@ -1172,6 +1229,7 @@ PalletTown_ProfessorOaksLab_EventScript_RivalTakesStarter::
+ 	waitmessage
+ 	playfanfare MUS_OBTAIN_KEY_ITEM
+ 	waitfanfare
++	call PalletTown_ProfessorOaksLab_EventScript_GreenTakesStarter
+ 	setvar VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3
+ 	call_if_set FLAG_OPENED_START_MENU, PalletTown_ProfessorOaksLab_EventScript_ReadyEndSignLadyScene
+ 	release
+@@ -1181,6 +1239,63 @@ PalletTown_ProfessorOaksLab_EventScript_ReadyEndSignLadyScene::
+ 	setvar VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1
+ 	return
+ 
++PalletTown_ProfessorOaksLab_EventScript_GreenTakesStarter::
++    goto_if_eq PLAYER_STARTER_NUM, 0, PalletTown_ProfessorOaksLab_EventScript_GreenTakesSquirtle
++    goto_if_eq PLAYER_STARTER_NUM, 1, PalletTown_ProfessorOaksLab_EventScript_GreenTakesCharmander
++    goto PalletTown_ProfessorOaksLab_EventScript_GreenTakesBulbasaur
++
++PalletTown_ProfessorOaksLab_EventScript_GreenTakesSquirtle::
++    setvar GREEN_STARTER_SPECIES, SPECIES_SQUIRTLE
++    setvar GREEN_STARTER_ID, LOCALID_SQUIRTLE_BALL
++    applymovement LOCALID_OAKS_LAB_GREEN, PalletTown_ProfessorOaksLab_Movement_GreenToSquirtle
++    waitmovement 0
++    goto PalletTown_ProfessorOaksLab_EventScript_GreenReceivesStarter
++
++PalletTown_ProfessorOaksLab_EventScript_GreenTakesCharmander::
++    setvar GREEN_STARTER_SPECIES, SPECIES_CHARMANDER
++    setvar GREEN_STARTER_ID, LOCALID_CHARMANDER_BALL
++    applymovement LOCALID_OAKS_LAB_GREEN, PalletTown_ProfessorOaksLab_Movement_GreenToCharmander
++    waitmovement 0
++    goto PalletTown_ProfessorOaksLab_EventScript_GreenReceivesStarter
++
++PalletTown_ProfessorOaksLab_EventScript_GreenTakesBulbasaur::
++    setvar GREEN_STARTER_SPECIES, SPECIES_BULBASAUR
++    setvar GREEN_STARTER_ID, LOCALID_BULBASAUR_BALL
++    applymovement LOCALID_OAKS_LAB_GREEN, PalletTown_ProfessorOaksLab_Movement_GreenToBulbasaur
++    waitmovement 0
++    goto PalletTown_ProfessorOaksLab_EventScript_GreenReceivesStarter
++
++PalletTown_ProfessorOaksLab_EventScript_GreenReceivesStarter::
++    msgbox PalletTown_ProfessorOaksLab_Text_GreenTakesStarter
++    removeobject GREEN_STARTER_ID
++    bufferspeciesname STR_VAR_1, GREEN_STARTER_SPECIES
++    message PalletTown_ProfessorOaksLab_Text_GreenReceivedStarter
++    waitmessage
++    playfanfare MUS_OBTAIN_KEY_ITEM
++    waitfanfare
++    return
++
++PalletTown_ProfessorOaksLab_Movement_GreenToSquirtle::
++    walk_right
++    walk_right
++    walk_left
++    walk_left
++    step_end
++
++PalletTown_ProfessorOaksLab_Movement_GreenToCharmander::
++    walk_right
++    walk_right
++    walk_right
++    walk_left
++    walk_left
++    walk_left
++    step_end
++
++PalletTown_ProfessorOaksLab_Movement_GreenToBulbasaur::
++    walk_right
++    walk_left
++    step_end
++
+ PalletTown_ProfessorOaksLab_Movement_RivalWalksToCharmander::
+ 	walk_down
+ 	walk_down
+diff --git a/data/maps/PalletTown_ProfessorOaksLab/text.inc b/data/maps/PalletTown_ProfessorOaksLab/text.inc
+index 849a643..eeec95c 100644
+--- a/data/maps/PalletTown_ProfessorOaksLab/text.inc
++++ b/data/maps/PalletTown_ProfessorOaksLab/text.inc
+@@ -354,4 +354,31 @@ PalletTown_ProfessorOaksLab_Text_RivalIllCompleteThePokedex::
+     .string "I think I'll try looking around\n"
+     .string "ONE ISLAND first…\p"
+     .string "Anyways, I'm outta here!$"
++PalletTown_ProfessorOaksLab_Text_GreenIntro::
++    .string "GREEN: I'm not going to let you two\n"
++    .string "have all the fun. I'm choosing too!$"
++
++PalletTown_ProfessorOaksLab_Text_GreenTakesStarter::
++    .string "GREEN: I'll take the last one.\n"
++    .string "That makes us even!$"
++
++PalletTown_ProfessorOaksLab_Text_GreenReceivedStarter::
++    .string "GREEN received the {STR_VAR_1}\n"
++    .string "from PROF. OAK!$"
++
++PalletTown_ProfessorOaksLab_Text_GreenHasStarter::
++    .string "GREEN: My {STR_VAR_1} and I are\n"
++    .string "ready. Don't underestimate us!$"
++
++PalletTown_ProfessorOaksLab_Text_GreenBattleIntro::
++    .string "GREEN: Let's see what our Pokémon\n"
++    .string "can do. I'm not holding back!$"
++
++PalletTown_ProfessorOaksLab_Text_GreenBattleDefeat::
++    .string "GREEN: I need to train harder.\n"
++    .string "This isn't over between us!$"
++
++PalletTown_ProfessorOaksLab_Text_GreenAfterBattle::
++    .string "GREEN: That's what makes this fun.\n"
++    .string "We'll keep getting stronger!$"
+ 
+diff --git a/include/constants/event_objects.h b/include/constants/event_objects.h
+index 9d8c514..f2aa420 100644
+--- a/include/constants/event_objects.h
++++ b/include/constants/event_objects.h
+@@ -155,8 +155,9 @@
+ #define OBJ_EVENT_GFX_DEOXYS_A 149
+ #define OBJ_EVENT_GFX_DEOXYS_N 150
+ #define OBJ_EVENT_GFX_SS_ANNE 151
++#define OBJ_EVENT_GFX_GREEN_RIVAL 152
+ 
+-#define NUM_OBJ_EVENT_GFX     152
++#define NUM_OBJ_EVENT_GFX     153
+ 
+ // These are dynamic object gfx ids.
+ // They correspond with the values of the VAR_OBJ_GFX_ID_X vars.
+diff --git a/include/constants/opponents.h b/include/constants/opponents.h
+index 3b893f2..28fa2b6 100644
+--- a/include/constants/opponents.h
++++ b/include/constants/opponents.h
+@@ -746,12 +746,15 @@
+ #define TRAINER_CHAMPION_REMATCH_BULBASAUR       740
+ #define TRAINER_CHAMPION_REMATCH_CHARMANDER      741
+ #define TRAINER_CUE_BALL_PAXTON                  742
++#define TRAINER_THREE_PATHS_GREEN_SQUIRTLE        743
++#define TRAINER_THREE_PATHS_GREEN_CHARMANDER      744
++#define TRAINER_THREE_PATHS_GREEN_BULBASAUR       745
+ 
+ // NOTE: Because each Trainer uses a flag to determine when they are defeated, there is 
+ //       only space for 25 additional trainers before trainer flag space overflows.
+ //       MAX_TRAINERS_COUNT can be increased but will take up additional saveblock space
+ 
+-#define NUM_TRAINERS                             743
++#define NUM_TRAINERS                             746
+ #define MAX_TRAINERS_COUNT                       768
+ 
+ #endif  // GUARD_CONSTANTS_OPPONENTS_H
+diff --git a/src/battle_script_commands.c b/src/battle_script_commands.c
+index 67f90a3..7937d0f 100644
+--- a/src/battle_script_commands.c
++++ b/src/battle_script_commands.c
+@@ -3116,7 +3116,6 @@ static void Cmd_getexp(void)
+     s32 i; // also used as stringId
+     u8 holdEffect;
+     s32 sentIn;
+-    s32 viaExpShare = 0;
+     u16 *exp = &gBattleStruct->expValue;
+ 
+     gBattlerFainted = GetBattlerForBattleScript(gBattlescriptCurrInstr[1]);
+@@ -3152,36 +3151,17 @@ static void Cmd_getexp(void)
+                 if (gBitTable[i] & sentIn)
+                     viaSentIn++;
+ 
+-                item = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+-
+-                if (item == ITEM_ENIGMA_BERRY)
+-                    holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+-                else
+-                    holdEffect = ItemId_GetHoldEffect(item);
+-
+-                if (holdEffect == HOLD_EFFECT_EXP_SHARE)
+-                    viaExpShare++;
+             }
+ 
+             calculatedExp = gSpeciesInfo[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level / 7;
+ 
+-            if (viaExpShare) // at least one mon is getting exp via exp share
+-            {
+-                *exp = SAFE_DIV(calculatedExp / 2, viaSentIn);
+-                if (*exp == 0)
+-                    *exp = 1;
+-
+-                gExpShareExp = calculatedExp / 2 / viaExpShare;
+-                if (gExpShareExp == 0)
+-                    gExpShareExp = 1;
+-            }
+-            else
+-            {
+-                *exp = SAFE_DIV(calculatedExp, viaSentIn);
+-                if (*exp == 0)
+-                    *exp = 1;
+-                gExpShareExp = 0;
+-            }
++            // Three Paths Exp. All: participating Pokemon receive the full
++            // normal share. Every other living party member receives 75% of
++            // that same per-participant amount automatically.
++            *exp = SAFE_DIV(calculatedExp, viaSentIn);
++            if (viaSentIn != 0 && *exp == 0)
++                *exp = 1;
++            gExpShareExp = 0;
+ 
+             gBattleScripting.getexpState++;
+             gBattleStruct->expGetterMonId = 0;
+@@ -3198,13 +3178,8 @@ static void Cmd_getexp(void)
+             else
+                 holdEffect = ItemId_GetHoldEffect(item);
+ 
+-            if (holdEffect != HOLD_EFFECT_EXP_SHARE && !(gBattleStruct->sentInPokes & 1))
+-            {
+-                *(&gBattleStruct->sentInPokes) >>= 1;
+-                gBattleScripting.getexpState = 5;
+-                gBattleMoveDamage = 0; // used for exp
+-            }
+-            else if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) == MAX_LEVEL)
++            if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) == MAX_LEVEL
++             || *exp == 0)
+             {
+                 *(&gBattleStruct->sentInPokes) >>= 1;
+                 gBattleScripting.getexpState = 5;
+@@ -3225,10 +3200,9 @@ static void Cmd_getexp(void)
+                     if (gBattleStruct->sentInPokes & 1)
+                         gBattleMoveDamage = *exp;
+                     else
+-                        gBattleMoveDamage = 0;
+-
+-                    if (holdEffect == HOLD_EFFECT_EXP_SHARE)
+-                        gBattleMoveDamage += gExpShareExp;
++                        gBattleMoveDamage = (*exp * 75) / 100;
++                    if (gBattleMoveDamage == 0)
++                        gBattleMoveDamage = 1;
+                     if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
+                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
+                     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+diff --git a/src/data/object_events/object_event_graphics_info.h b/src/data/object_events/object_event_graphics_info.h
+index 78ee95a..1b490b0 100644
+--- a/src/data/object_events/object_event_graphics_info.h
++++ b/src/data/object_events/object_event_graphics_info.h
+@@ -1328,6 +1328,27 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GreenNormal = {
+     .affineAnims = gDummySpriteAffineAnimTable,
+ };
+ 
++// Three Paths: use Leaf's existing overworld frames as a normal NPC, with a
++// dedicated special palette slot so the player sprite palette is not reused.
++const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GreenRival = {
++    .tileTag = TAG_NONE,
++    .paletteTag = OBJ_EVENT_PAL_TAG_GREEN_RIVAL,
++    .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
++    .size = 512,
++    .width = 16,
++    .height = 32,
++    .paletteSlot = PALSLOT_NPC_SPECIAL,
++    .shadowSize = SHADOW_SIZE_M,
++    .inanimate = FALSE,
++    .disableReflectionPaletteLoad = TRUE,
++    .tracks = TRACKS_FOOT,
++    .oam = &gObjectEventBaseOam_16x32,
++    .subspriteTables = gObjectEventSpriteOamTables_16x32,
++    .anims = sAnimTable_RedGreenNormal,
++    .images = sPicTable_GreenNormal,
++    .affineAnims = gDummySpriteAffineAnimTable,
++};
++
+ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GreenBike = {
+     .tileTag = TAG_NONE,
+     .paletteTag = OBJ_EVENT_PAL_TAG_PLAYER_GREEN,
+diff --git a/src/data/object_events/object_event_graphics_info_pointers.h b/src/data/object_events/object_event_graphics_info_pointers.h
+index af2f8af..a1efc56 100644
+--- a/src/data/object_events/object_event_graphics_info_pointers.h
++++ b/src/data/object_events/object_event_graphics_info_pointers.h
+@@ -6,6 +6,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RedFish;
+ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RedVSSeeker;
+ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RedVSSeekerBike;
+ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GreenNormal;
++const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GreenRival;
+ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GreenBike;
+ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GreenSurf;
+ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GreenFieldMove;
+@@ -161,6 +162,7 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
+     [OBJ_EVENT_GFX_RED_VS_SEEKER]            = &gObjectEventGraphicsInfo_RedVSSeeker,
+     [OBJ_EVENT_GFX_RED_VS_SEEKER_BIKE]       = &gObjectEventGraphicsInfo_RedVSSeekerBike,
+     [OBJ_EVENT_GFX_GREEN_NORMAL]             = &gObjectEventGraphicsInfo_GreenNormal,
++    [OBJ_EVENT_GFX_GREEN_RIVAL]              = &gObjectEventGraphicsInfo_GreenRival,
+     [OBJ_EVENT_GFX_GREEN_BIKE]               = &gObjectEventGraphicsInfo_GreenBike,
+     [OBJ_EVENT_GFX_GREEN_SURF]               = &gObjectEventGraphicsInfo_GreenSurf,
+     [OBJ_EVENT_GFX_GREEN_FIELD_MOVE]         = &gObjectEventGraphicsInfo_GreenFieldMove,
+diff --git a/src/data/trainer_parties.h b/src/data/trainer_parties.h
+index 2e57800..1bbadf1 100644
+--- a/src/data/trainer_parties.h
++++ b/src/data/trainer_parties.h
+@@ -10860,3 +10860,17 @@ static const struct TrainerMonNoItemDefaultMoves sParty_CueBallPaxton[] = {
+         .species = SPECIES_MUK,
+     },
+ };
++
++// Three Paths: Green receives the remaining Kanto starter and can be challenged
++// in Professor Oak's Lab after the first battle with Blue.
++static const struct TrainerMonNoItemDefaultMoves sParty_ThreePathsGreenSquirtle[] = {
++    { .iv = 0, .lvl = 5, .species = SPECIES_SQUIRTLE },
++};
++
++static const struct TrainerMonNoItemDefaultMoves sParty_ThreePathsGreenCharmander[] = {
++    { .iv = 0, .lvl = 5, .species = SPECIES_CHARMANDER },
++};
++
++static const struct TrainerMonNoItemDefaultMoves sParty_ThreePathsGreenBulbasaur[] = {
++    { .iv = 0, .lvl = 5, .species = SPECIES_BULBASAUR },
++};
+diff --git a/src/data/trainers.h b/src/data/trainers.h
+index 02afbfd..fd1425b 100644
+--- a/src/data/trainers.h
++++ b/src/data/trainers.h
+@@ -7422,4 +7422,34 @@ const struct Trainer gTrainers[] = {
+         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
+         .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallPaxton),
+     },
++    [TRAINER_THREE_PATHS_GREEN_SQUIRTLE] = {
++        .trainerClass = TRAINER_CLASS_RIVAL_EARLY,
++        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE | F_TRAINER_FEMALE,
++        .trainerPic = TRAINER_PIC_LEAF,
++        .trainerName = _("GREEN"),
++        .items = {},
++        .doubleBattle = FALSE,
++        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
++        .party = NO_ITEM_DEFAULT_MOVES(sParty_ThreePathsGreenSquirtle),
++    },
++    [TRAINER_THREE_PATHS_GREEN_CHARMANDER] = {
++        .trainerClass = TRAINER_CLASS_RIVAL_EARLY,
++        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE | F_TRAINER_FEMALE,
++        .trainerPic = TRAINER_PIC_LEAF,
++        .trainerName = _("GREEN"),
++        .items = {},
++        .doubleBattle = FALSE,
++        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
++        .party = NO_ITEM_DEFAULT_MOVES(sParty_ThreePathsGreenCharmander),
++    },
++    [TRAINER_THREE_PATHS_GREEN_BULBASAUR] = {
++        .trainerClass = TRAINER_CLASS_RIVAL_EARLY,
++        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE | F_TRAINER_FEMALE,
++        .trainerPic = TRAINER_PIC_LEAF,
++        .trainerName = _("GREEN"),
++        .items = {},
++        .doubleBattle = FALSE,
++        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
++        .party = NO_ITEM_DEFAULT_MOVES(sParty_ThreePathsGreenBulbasaur),
++    },
+ };
+diff --git a/src/event_object_movement.c b/src/event_object_movement.c
+index 8e82824..275cdc4 100644
+--- a/src/event_object_movement.c
++++ b/src/event_object_movement.c
+@@ -461,6 +461,7 @@ static const u8 gInitialMovementTypeFacingDirections[MOVEMENT_TYPES_COUNT] = {
+ #define OBJ_EVENT_PAL_TAG_RS_MOVING_BOX               0x1112
+ #define OBJ_EVENT_PAL_TAG_METEORITE                   0x1113
+ #define OBJ_EVENT_PAL_TAG_SEAGALLOP                   0x1114
++#define OBJ_EVENT_PAL_TAG_GREEN_RIVAL                 0x111C
+ #define OBJ_EVENT_PAL_TAG_SS_ANNE                     0x1115
+ #define OBJ_EVENT_PAL_TAG_RS_PLAYER_UNDERWATER        0x1116
+ #define OBJ_EVENT_PAL_TAG_RS_KYOGRE                   0x1117
+@@ -497,6 +498,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
+     {gObjectEventPal_Meteorite,               OBJ_EVENT_PAL_TAG_METEORITE},
+     {gObjectEventPal_SSAnne,                  OBJ_EVENT_PAL_TAG_SS_ANNE},
+     {gObjectEventPal_Seagallop,               OBJ_EVENT_PAL_TAG_SEAGALLOP},
++    {gObjectEventPal_Player,                   OBJ_EVENT_PAL_TAG_GREEN_RIVAL},
+     {},
+ };
+ 
