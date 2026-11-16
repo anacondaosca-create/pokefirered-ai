@@ -1,0 +1,61 @@
+
+name: Build Three Paths GBA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      GAME_VERSION: FIRERED
+      GAME_LANGUAGE: ENGLISH
+      GAME_REVISION: 0
+      MODERN: 0
+      COMPARE: 0
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential binutils-arm-none-eabi libpng-dev
+
+      - name: Checkout agbcc
+        uses: actions/checkout@v4
+        with:
+          repository: pret/agbcc
+          path: agbcc
+
+      - name: Install agbcc
+        working-directory: agbcc
+        run: |
+          ./build.sh
+          ./install.sh ../
+
+      - name: Validate patch
+        run: |
+          git apply --check Three_Paths_MVP.patch
+
+      - name: Apply Three Paths
+        run: |
+          git apply Three_Paths_MVP.patch
+
+      - name: Compile ROM
+        run: |
+          make -j2 all
+
+      - name: Upload ROM
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pokemon-FireRed-Three-Paths
+          path: pokefirered.gba
+          if-no-files-found: error
+          retention-days: 14
